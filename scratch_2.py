@@ -1,12 +1,28 @@
 import cv2
 import numpy as np
-def nothing(x):
-    pass
+def nothing(x): pass
 cap = cv2.VideoCapture(1)
+zero = 0
+#f = open("thresh_val.txt","w+")
+#####
+f = open("thresh_val.txt","r+")
+#f.seek(0)
+val = f.read().split()
+print(val)
+print(len(val))
+if(len(val)!= 3):
+    for i in range(3):
+        f.write("%d\r" % zero)
+    f.seek(0)
+    val = f.readlines()
+#print(val)
+print(int(val[0]))
+#####
+
 cv2.namedWindow('opened')
-cv2.createTrackbar('black','opened',0,255,nothing)
-cv2.createTrackbar('area_max','opened',0,5000,nothing)
-cv2.createTrackbar('area_min','opened',0,500,nothing)
+cv2.createTrackbar('black','opened',int(val[0]),255,nothing)
+cv2.createTrackbar('area_max','opened',int(val[1]),5000,nothing)
+cv2.createTrackbar('area_min','opened',int(val[2]),500,nothing)
 kernel = np.ones((5,5),np.uint8)
 center = []
 ret, frame = cap.read()
@@ -24,7 +40,7 @@ while(1):
 
     blur = cv2.GaussianBlur(thresh,(5,5),0)
     opening = cv2.morphologyEx(blur, cv2.MORPH_OPEN, kernel)
-    img, contours, heirarchy = cv2.findContours(opening, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    contours, heirarchy = cv2.findContours(opening, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     area = []
     for cnt in contours:
         t = 0
@@ -42,7 +58,7 @@ while(1):
                 x2,y2 = center.pop()
                 screen = cv2.line(screen,(x1,y1),(x2,y2),(0,255,255),5)
                 center.append([x1,y1])
-    print area
+    print (area)
 
     cv2.imshow('opened', opening)
     cv2.imshow('screen',screen)
@@ -54,11 +70,18 @@ while(1):
         break
     elif k==32:
         screen = np.zeros((rows, cols, ch), np.uint8)
+        if(len(center)>0):
+            center.clear()
+    elif (k == 116 or k == 84):
+        f.seek(0)
+        f.write("%d\r" % black)
+        f.write("%d\r" % max_val)
+        f.write("%d\r" % min_val)
+
     elif (k== 115 or k== 83):
-        
         cv2.waitKey(0)
         if (len(center)>0):
             center.pop()
         t=1
-
+f.close()
 cv2.destroyAllWindows()
