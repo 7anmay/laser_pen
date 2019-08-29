@@ -23,7 +23,7 @@ h1=1100
 h2=1280
 clc = cv2.imread('Clear-1.jpg')
 clc = cv2.resize(clc,(h2-h1,w2-w1), interpolation =cv2.INTER_AREA)
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 change_res(width,height)
 cv2.namedWindow('opened')
 cv2.createTrackbar('black', 'opened', 170, 255, nothing)
